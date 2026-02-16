@@ -1,32 +1,45 @@
 [
-  {
-    "model": "Nokia 3310",
-    "year": 2000,
-    "fact": "Famous for extreme battery life and durability",
-    "wiki": "Nokia_3310"
-  },
-  {
-    "model": "Nokia 1100",
-    "year": 2003,
-    "fact": "One of the best-selling phones of all time",
-    "wiki": "Nokia_1100"
-  },
-  {
-    "model": "Nokia 6600",
-    "year": 2003,
-    "fact": "Popular Symbian smartphone with rounded design",
-    "wiki": "Nokia_6600"
-  },
-  {
-    "model": "Nokia N95",
-    "year": 2007,
-    "fact": "Slider phone with advanced camera for its time",
-    "wiki": "Nokia_N95"
-  },
-  {
-    "model": "Nokia 7610",
-    "year": 2004,
-    "fact": "Known for its unique leaf-shaped design",
-    "wiki": "Nokia_7610"
-  }
+  {"model":"Nokia 1100","year":2003,"fact":"World’s best‑selling basic phone ever","wiki":"Nokia_1100"},
+  {"model":"Nokia 1110","year":2005,"fact":"Very popular beginner handset","wiki":"Nokia_1110"},
+  {"model":"Nokia 1110i","year":2006,"fact":"Minor variant of the 1110 series","wiki":"Nokia_1110i"},
+  {"model":"Nokia 1200","year":2007,"fact":"Ultra‑basic feature phone","wiki":"Nokia_1200"},
+  {"model":"Nokia 1202","year":2007,"fact":"Simple phone with long battery life","wiki":"Nokia_1202"},
+  {"model":"Nokia 3100","year":2003,"fact":"Early color display phone","wiki":"Nokia_3100"},
+  {"model":"Nokia 3210","year":1999,"fact":"Legendary candybar with internal antenna","wiki":"Nokia_3210"},
+  {"model":"Nokia 3220","year":2004,"fact":"Fun design with flashing lights","wiki":"Nokia_3220"},
+  {"model":"Nokia 3230","year":2005,"fact":"Camera phone with multimedia features","wiki":"Nokia_3230"},
+  {"model":"Nokia 3250","year":2005,"fact":"Rotating bottom for music control","wiki":"Nokia_3250"},
+  {"model":"Nokia 3300","year":2003,"fact":"Music‑oriented phone with keypad layout","wiki":"Nokia_3300"},
+  {"model":"Nokia 3310","year":2000,"fact":"Iconic indestructible classic","wiki":"Nokia_3310"},
+  {"model":"Nokia 3510","year":2002,"fact":"Early GPRS‑capable phone","wiki":"Nokia_3510"},
+  {"model":"Nokia 3650","year":2003,"fact":"Symbian phone with circular keypad","wiki":"Nokia_3650"},
+  {"model":"Nokia 5070","year":2006,"fact":"Basic 2G phone with color screen","wiki":"Nokia_5070"},
+  {"model":"Nokia 5100","year":2003,"fact":"Rugged phone for active use","wiki":"Nokia_5100"},
+  {"model":"Nokia 5130 XpressMusic","year":2009,"fact":"Music‑focused slider phone","wiki":"Nokia_5130_XpressMusic"},
+  {"model":"Nokia 5200","year":2006,"fact":"Entry‑level music phone","wiki":"Nokia_5200"},
+  {"model":"Nokia 5220","year":2008,"fact":"Candybar feature phone","wiki":"Nokia_5220"},
+  {"model":"Nokia 5230","year":2009,"fact":"Touchscreen smartphone with GPS","wiki":"Nokia_5230"},
+  {"model":"Nokia 5310 XpressMusic","year":2007,"fact":"Slim music phone with dedicated keys","wiki":"Nokia_5310_XpressMusic"},
+  {"model":"Nokia 5500 Sport","year":2006,"fact":"Sports‑oriented phone with rugged build","wiki":"Nokia_5500_Sport"},
+  {"model":"Nokia 5800 XpressMusic","year":2008,"fact":"First Symbian touchscreen phone","wiki":"Nokia_5800_XpressMusic"},
+  {"model":"Nokia 6070","year":2006,"fact":"Entry‑level candybar phone","wiki":"Nokia_6070"},
+  {"model":"Nokia 6100","year":2002,"fact":"Small and lightweight classic","wiki":"Nokia_6100"},
+  {"model":"Nokia 6110 Navigator","year":2007,"fact":"Navigator series with GPS","wiki":"Nokia_6110_Navigator"},
+  {"model":"Nokia 6120 classic","year":2007,"fact":"Compact smartphone with 3G","wiki":"Nokia_6120_classic"},
+  {"model":"Nokia 6230","year":2003,"fact":"Popular early camera phone","wiki":"Nokia_6230"},
+  {"model":"Nokia 6230i","year":2005,"fact":"Improved 6230 with better screen","wiki":"Nokia_6230i"},
+  {"model":"Nokia 6300","year":2007,"fact":"Slim feature phone with metal trim","wiki":"Nokia_6300"},
+  {"model":"Nokia 6500 classic","year":2007,"fact":"Ultra‑thin metal classic","wiki":"Nokia_6500_classic"},
+  {"model":"Nokia 6600","year":2003,"fact":"High‑end Symbian smartphone","wiki":"Nokia_6600"},
+  {"model":"Nokia 6680","year":2005,"fact":"Dual‑camera early 3G phone","wiki":"Nokia_6680"},
+  {"model":"Nokia N70","year":2005,"fact":"Nseries multimedia phone","wiki":"Nokia_N70"},
+  {"model":"Nokia N73","year":2006,"fact":"Popular Nseries with great camera","wiki":"Nokia_N73" },
+  {"model":"Nokia N95","year":2007,"fact":"Flagship slider with GPS & camera","wiki":"Nokia_N95" },
+  {"model":"Nokia N97","year":2009,"fact":"Smartphone with large touchscreen","wiki":"Nokia_N97" },
+  {"model":"Nokia N900","year":2009,"fact":"Linux‑based internet powerhouse","wiki":"Nokia_N900" },
+  {"model":"Nokia 6700 classic","year":2009,"fact":"Elegant metal body phone","wiki":"Nokia_6700_classic" },
+  {"model":"Nokia 6710 Navigator","year":2009,"fact":"Navigator with improved GPS","wiki":"Nokia_6710_Navigator" },
+  {"model":"Nokia 6720 classic","year":2009,"fact":"Solid midrange feature phone","wiki":"Nokia_6720_classic" },
+  {"model":"Nokia X3-02 Touch and Type","year":2010,"fact":"Touch + keypad hybrid","wiki":"Nokia_X3_Touch_and_Type" },
+  {"model":"Nokia N8","year":2010,"fact":"First Symbian^3 touchscreen phone","wiki":"Nokia_N8" }
 ]
