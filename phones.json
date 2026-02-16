@@ -1,0 +1,32 @@
+[
+  {
+    "model": "Nokia 3310",
+    "year": 2000,
+    "fact": "Famous for extreme battery life and durability",
+    "wiki": "Nokia_3310"
+  },
+  {
+    "model": "Nokia 1100",
+    "year": 2003,
+    "fact": "One of the best-selling phones of all time",
+    "wiki": "Nokia_1100"
+  },
+  {
+    "model": "Nokia 6600",
+    "year": 2003,
+    "fact": "Popular Symbian smartphone with rounded design",
+    "wiki": "Nokia_6600"
+  },
+  {
+    "model": "Nokia N95",
+    "year": 2007,
+    "fact": "Slider phone with advanced camera for its time",
+    "wiki": "Nokia_N95"
+  },
+  {
+    "model": "Nokia 7610",
+    "year": 2004,
+    "fact": "Known for its unique leaf-shaped design",
+    "wiki": "Nokia_7610"
+  }
+]
