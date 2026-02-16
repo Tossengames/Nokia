@@ -1,10 +1,30 @@
 let phones = [];
-let currentQuestion = null;
 let questionCount = 0;
 let correctCount = 0;
 const totalQuestions = 5;
 
-// Elements
+// --- SFX ENGINE ---
+const SFX = {
+    ctx: null,
+    init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+    play(freq, type, duration, vol = 0.1) {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    },
+    click() { this.play(600, 'sine', 0.1); },
+    correct() { this.play(800, 'sine', 0.1); setTimeout(() => this.play(1200, 'sine', 0.2), 100); },
+    wrong() { this.play(150, 'square', 0.3, 0.05); }
+};
+
 const screens = {
     menu: document.getElementById("menu"),
     info: document.getElementById("info-screen"),
@@ -13,22 +33,18 @@ const screens = {
     result: document.getElementById("result-screen")
 };
 
-const optionsContainer = document.getElementById("options-container");
-const feedbackPanel = document.getElementById("feedback-panel");
-const nextBtn = document.getElementById("next-btn");
+// Nav
+document.getElementById("play-btn").onclick = startQuiz;
+document.getElementById("info-btn").onclick = () => switchScreen('info');
+document.getElementById("support-btn").onclick = () => switchScreen('support');
+document.getElementById("info-back").onclick = () => switchScreen('menu');
+document.getElementById("support-back").onclick = () => switchScreen('menu');
+document.getElementById("next-btn").onclick = nextQuestion;
 
-// Initialization
-document.getElementById("play-btn").addEventListener("click", startQuiz);
-document.getElementById("info-btn").addEventListener("click", () => switchScreen('info'));
-document.getElementById("support-btn").addEventListener("click", () => switchScreen('support'));
-document.querySelectorAll('.menu-btn[id$="-back"]').forEach(btn => {
-    btn.addEventListener("click", () => switchScreen('menu'));
-});
-nextBtn.addEventListener("click", nextQuestion);
-
-function switchScreen(screenKey) {
+function switchScreen(key) {
+    SFX.click();
     Object.values(screens).forEach(s => s.classList.add("hidden"));
-    screens[screenKey].classList.remove("hidden");
+    screens[key].classList.remove("hidden");
 }
 
 async function startQuiz() {
@@ -44,96 +60,113 @@ async function startQuiz() {
 
 function nextQuestion() {
     if (questionCount >= totalQuestions) {
-        showFinalResults();
+        showResults();
         return;
     }
-
     questionCount++;
-    feedbackPanel.classList.add("hidden");
-    optionsContainer.innerHTML = "Searching the archives...";
+    document.getElementById("feedback-panel").classList.add("hidden");
+    document.getElementById("options-container").style.pointerEvents = "auto";
     
-    document.getElementById("progress").textContent = `Question ${questionCount}/${totalQuestions}`;
-    document.getElementById("score").textContent = `Score: ${correctCount}`;
-
-    // Logic for Question Types
     const type = Math.random() < 0.5 ? 'A' : 'B';
     const correctPhone = phones[Math.floor(Math.random() * phones.length)];
-    
-    // Type A: 4 options | Type B: 3 options
-    const distractorCount = (type === 'A') ? 3 : 2;
+    const distCount = (type === 'A') ? 3 : 2; // Type A=4 total, Type B=3 total
     
     const distractors = phones
         .filter(p => p.model !== correctPhone.model)
         .sort(() => 0.5 - Math.random())
-        .slice(0, distractorCount);
+        .slice(0, distCount);
 
     const options = [...distractors, correctPhone].sort(() => 0.5 - Math.random());
-    
-    displayQuestion(type, correctPhone, options);
+    renderQuestion(type, correctPhone, options);
 }
 
-async function displayQuestion(type, correct, options) {
-    optionsContainer.innerHTML = "";
+async function renderQuestion(type, correct, options) {
+    const container = document.getElementById("options-container");
+    const qText = document.getElementById("question-text");
+    container.innerHTML = "Fetching device...";
     
+    document.getElementById("progress").textContent = `Q: ${questionCount}/${totalQuestions}`;
+    document.getElementById("score-display").textContent = `Score: ${correctCount}`;
+
     if (type === 'A') {
-        // TYPE A: Big Image, 4 Text Buttons
-        document.getElementById("question-text").textContent = "Identify this classic Nokia:";
-        const imgUrl = await fetchImage(correct.wiki);
-        optionsContainer.innerHTML = `<img src="${imgUrl}" class="phone-img-large">`;
-        
+        qText.textContent = "Which Nokia is this?";
+        const imgUrl = await fetchWikiImage(correct.wiki);
+        container.innerHTML = `<img src="${imgUrl}" class="phone-img-large">`;
         options.forEach(opt => {
             const btn = document.createElement("button");
             btn.className = "option-btn";
             btn.textContent = opt.model;
-            btn.onclick = () => handleAnswer(opt === correct, correct);
-            optionsContainer.appendChild(btn);
+            btn.onclick = (e) => handleCheck(opt === correct, correct, e.target);
+            container.appendChild(btn);
         });
     } else {
-        // TYPE B: Fact Text, 3 Small Images
-        document.getElementById("question-text").textContent = `Which phone was known for: "${correct.fact}"?`;
+        qText.textContent = `Which phone: "${correct.fact}"?`;
         const grid = document.createElement("div");
         grid.className = "image-options-grid";
-        
         for (let opt of options) {
-            const imgUrl = await fetchImage(opt.wiki);
+            const imgUrl = await fetchWikiImage(opt.wiki);
             const card = document.createElement("div");
             card.className = "img-option-card";
             card.innerHTML = `<img src="${imgUrl}" class="phone-img-small">`;
-            card.onclick = () => handleAnswer(opt === correct, correct);
+            card.onclick = () => handleCheck(opt === correct, correct, card);
             grid.appendChild(card);
         }
-        optionsContainer.appendChild(grid);
+        container.innerHTML = "";
+        container.appendChild(grid);
     }
 }
 
-function handleAnswer(isCorrect, phone) {
-    if (feedbackPanel.classList.contains("hidden")) { // Prevent double clicks
-        if (isCorrect) correctCount++;
-        
-        const feedbackContent = document.getElementById("feedback-content");
-        feedbackContent.innerHTML = isCorrect ? 
-            `<h2 style="color:var(--success)">✓ Correct!</h2>` : 
-            `<h2 style="color:var(--error)">✗ Wrong</h2>`;
-        feedbackContent.innerHTML += `<p>That's the <strong>${phone.model}</strong> (${phone.year}).</p>`;
-        
-        feedbackPanel.classList.remove("hidden");
-        // Disable option clicks after answering
-        optionsContainer.style.pointerEvents = "none";
+function handleCheck(isCorrect, phone, el) {
+    document.getElementById("options-container").style.pointerEvents = "none";
+    if (isCorrect) {
+        correctCount++;
+        SFX.correct();
+        el.classList.add("vfx-correct");
+    } else {
+        SFX.wrong();
+        el.classList.add("vfx-wrong");
     }
+
+    const feedback = document.getElementById("feedback-content");
+    feedback.innerHTML = `<h3>${isCorrect ? 'Correct!' : 'Wrong Answer'}</h3>
+                          <p>It's the <b>${phone.model}</b> (${phone.year})</p>`;
+    document.getElementById("feedback-panel").classList.remove("hidden");
 }
 
-function showFinalResults() {
+function showResults() {
     switchScreen('result');
-    document.getElementById("final-stats").innerHTML = `You got ${correctCount} out of ${totalQuestions}`;
-    let msg = correctCount === 5 ? "👑 Absolute Legend!" : "📱 Pretty good, Millennial!";
-    document.getElementById("rank-message").textContent = msg;
+    const stats = document.getElementById("final-stats");
+    const starContainer = document.getElementById("stars-container");
+    const rankMsg = document.getElementById("rank-message");
+    
+    stats.textContent = `${correctCount} / ${totalQuestions}`;
+    starContainer.innerHTML = ""; 
+
+    // Animated Star Loop
+    for (let i = 0; i < totalQuestions; i++) {
+        const star = document.createElement("span");
+        star.className = "star";
+        star.innerHTML = "★";
+        if (i < correctCount) star.classList.add("active");
+        star.style.animationDelay = `${i * 0.15}s`;
+        
+        // Star sound pop
+        setTimeout(() => {
+            SFX.play(500 + (i * 100), 'sine', 0.1, 0.03);
+        }, i * 150);
+
+        starContainer.appendChild(star);
+    }
+
+    rankMsg.textContent = correctCount === 5 ? "Nokia Legend! 🏆" : 
+                         correctCount >= 3 ? "Great Job! 📱" : "Keep Trying! 💾";
 }
 
-async function fetchImage(wikiPage) {
+async function fetchWikiImage(page) {
     try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${wikiPage}&prop=pageimages&pithumbsize=300&format=json&origin=*`);
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${page}&prop=pageimages&pithumbsize=400&format=json&origin=*`);
         const data = await res.json();
-        const page = Object.values(data.query.pages)[0];
-        return page.thumbnail ? page.thumbnail.source : "https://via.placeholder.com/150?text=No+Image";
-    } catch { return "https://via.placeholder.com/150?text=Error"; }
+        const p = Object.values(data.query.pages)[0];
+        return p.thumbnail ? p.thumbnail.source : "https://via.placeholder.com/200?text=No+Image";
+    } catch { return "https://via.placeholder.com/200?text=Error"; }
 }
