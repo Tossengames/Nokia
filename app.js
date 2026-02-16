@@ -62,13 +62,12 @@ function nextQuestion() {
         return;
     }
     questionCount++;
-    document.getElementById("feedback-panel").classList.add("hidden");
-    document.getElementById("options-container").style.pointerEvents = "auto";
+    document.getElementById("feedback-overlay").classList.add("hidden");
     
     const type = Math.random() < 0.5 ? 'A' : 'B';
     const correctPhone = phones[Math.floor(Math.random() * phones.length)];
     
-    // BOTH types now use 3 options (1 correct + 2 distractors)
+    // Both types now use exactly 3 total options (1 correct + 2 distractors)
     const distractors = phones
         .filter(p => p.model !== correctPhone.model)
         .sort(() => 0.5 - Math.random())
@@ -81,24 +80,24 @@ function nextQuestion() {
 async function renderQuestion(type, correct, options) {
     const container = document.getElementById("options-container");
     const qText = document.getElementById("question-text");
-    container.innerHTML = "Fetching device...";
+    container.innerHTML = "Locating handset...";
     
     document.getElementById("progress").textContent = `Q: ${questionCount}/${totalQuestions}`;
     document.getElementById("score-display").textContent = `Score: ${correctCount}`;
 
     if (type === 'A') {
-        qText.textContent = "Which Nokia is this?";
+        qText.textContent = "What model is this?";
         const imgUrl = await fetchWikiImage(correct.wiki);
         container.innerHTML = `<img src="${imgUrl}" class="phone-img-large">`;
         options.forEach(opt => {
             const btn = document.createElement("button");
             btn.className = "option-btn";
             btn.textContent = opt.model;
-            btn.onclick = (e) => handleCheck(opt === correct, correct, e.target);
+            btn.onclick = () => handleCheck(opt === correct, correct, btn);
             container.appendChild(btn);
         });
     } else {
-        qText.textContent = `Which phone: "${correct.fact}"?`;
+        qText.textContent = `"${correct.fact}"`;
         const grid = document.createElement("div");
         grid.className = "image-options-grid";
         for (let opt of options) {
@@ -106,10 +105,7 @@ async function renderQuestion(type, correct, options) {
             const card = document.createElement("div");
             card.className = "img-option-card";
             card.innerHTML = `<img src="${imgUrl}" class="phone-img-small">`;
-            // Fixed touch/click interaction
-            card.addEventListener('click', (e) => {
-                handleCheck(opt === correct, correct, card);
-            });
+            card.onclick = () => handleCheck(opt === correct, correct, card);
             grid.appendChild(card);
         }
         container.innerHTML = "";
@@ -118,9 +114,6 @@ async function renderQuestion(type, correct, options) {
 }
 
 function handleCheck(isCorrect, phone, el) {
-    if(!document.getElementById("feedback-panel").classList.contains("hidden")) return;
-    
-    document.getElementById("options-container").style.pointerEvents = "none";
     if (isCorrect) {
         correctCount++;
         SFX.correct();
@@ -130,18 +123,21 @@ function handleCheck(isCorrect, phone, el) {
         el.classList.add("vfx-wrong");
     }
 
-    const feedback = document.getElementById("feedback-content");
-    feedback.innerHTML = `<h3>${isCorrect ? 'Correct!' : 'Wrong Answer'}</h3>
-                          <p>It's the <b>${phone.model}</b> (${phone.year})</p>`;
-    document.getElementById("feedback-panel").classList.remove("hidden");
+    const overlay = document.getElementById("feedback-overlay");
+    const feedbackText = document.getElementById("feedback-text");
+    
+    feedbackText.innerHTML = `
+        <h2 style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">${isCorrect ? 'Correct!' : 'Wrong!'}</h2>
+        <p>This is the <strong>${phone.model}</strong> (${phone.year}).</p>
+    `;
+    
+    overlay.classList.remove("hidden");
 }
 
 function showResults() {
     switchScreen('result');
     const stats = document.getElementById("final-stats");
     const starContainer = document.getElementById("stars-container");
-    const rankMsg = document.getElementById("rank-message");
-    
     stats.textContent = `${correctCount} / ${totalQuestions}`;
     starContainer.innerHTML = ""; 
 
@@ -151,18 +147,14 @@ function showResults() {
         star.innerHTML = "★";
         if (i < correctCount) star.classList.add("active");
         star.style.animationDelay = `${i * 0.15}s`;
-        
-        // Rising Star SFX
         setTimeout(() => {
-            const freq = 500 + (i * 150);
-            SFX.play(freq, 'sine', 0.1, 0.04);
+            SFX.play(500 + (i * 150), 'sine', 0.1, 0.04);
         }, i * 150);
-
         starContainer.appendChild(star);
     }
-
-    rankMsg.textContent = correctCount === 5 ? "Nokia Legend! 🏆" : 
-                         correctCount >= 3 ? "Great Job! 📱" : "Keep Trying! 💾";
+    
+    document.getElementById("rank-message").textContent = 
+        correctCount === 5 ? "Nokia Legend! 🏆" : (correctCount >= 3 ? "Great Job! 📱" : "Keep Trying! 💾");
 }
 
 async function fetchWikiImage(page) {
