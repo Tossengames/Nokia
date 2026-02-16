@@ -3,20 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nokia Nostalgia Quiz Test</title>
+  <title>Nokia Nostalgia Quiz</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="container">
-    <h1>Nokia Nostalgia Quiz Test</h1>
-    <p>Click the button to load a random Nokia phone from Wikipedia.</p>
+<div class="container">
 
-    <button onclick="loadPhone()">Load Phone</button>
+  <!-- Main Menu -->
+  <div id="menu">
+    <h1>Nokia Nostalgia Quiz</h1>
+    <button class="menu-btn" id="play-btn">Play</button>
+    <button class="menu-btn" id="info-btn">Info</button>
+    <button class="menu-btn" id="support-btn">Support</button>
+  </div>
 
+  <!-- Info Screen -->
+  <div id="info-screen" class="hidden">
+    <h2>Info</h2>
+    <p>
+      Test your memory of classic Nokia phones! 
+      See if you’re a true millennial and remember these iconic devices. 
+      Answer 5 questions per session. You will get feedback and a rank at the end.
+    </p>
+    <button class="menu-btn" id="info-back">Back to Menu</button>
+  </div>
+
+  <!-- Support Screen -->
+  <div id="support-screen" class="hidden">
+    <h2>Support</h2>
+    <p>
+      You can support the game on Ko-fi. Link will be added soon.
+    </p>
+    <button class="menu-btn" id="support-back">Back to Menu</button>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div id="quiz-screen" class="hidden">
+    <p id="question-text">Question will appear here</p>
+    <div id="options"></div>
     <div id="result"></div>
   </div>
 
-  <script src="app.js"></script>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
