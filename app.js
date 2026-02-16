@@ -3,7 +3,6 @@ let questionCount = 0;
 let correctCount = 0;
 const totalQuestions = 5;
 
-// --- SFX ENGINE ---
 const SFX = {
     ctx: null,
     init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
@@ -33,7 +32,6 @@ const screens = {
     result: document.getElementById("result-screen")
 };
 
-// Nav
 document.getElementById("play-btn").onclick = startQuiz;
 document.getElementById("info-btn").onclick = () => switchScreen('info');
 document.getElementById("support-btn").onclick = () => switchScreen('support');
@@ -69,12 +67,12 @@ function nextQuestion() {
     
     const type = Math.random() < 0.5 ? 'A' : 'B';
     const correctPhone = phones[Math.floor(Math.random() * phones.length)];
-    const distCount = (type === 'A') ? 3 : 2; // Type A=4 total, Type B=3 total
     
+    // BOTH types now use 3 options (1 correct + 2 distractors)
     const distractors = phones
         .filter(p => p.model !== correctPhone.model)
         .sort(() => 0.5 - Math.random())
-        .slice(0, distCount);
+        .slice(0, 2);
 
     const options = [...distractors, correctPhone].sort(() => 0.5 - Math.random());
     renderQuestion(type, correctPhone, options);
@@ -108,7 +106,10 @@ async function renderQuestion(type, correct, options) {
             const card = document.createElement("div");
             card.className = "img-option-card";
             card.innerHTML = `<img src="${imgUrl}" class="phone-img-small">`;
-            card.onclick = () => handleCheck(opt === correct, correct, card);
+            // Fixed touch/click interaction
+            card.addEventListener('click', (e) => {
+                handleCheck(opt === correct, correct, card);
+            });
             grid.appendChild(card);
         }
         container.innerHTML = "";
@@ -117,6 +118,8 @@ async function renderQuestion(type, correct, options) {
 }
 
 function handleCheck(isCorrect, phone, el) {
+    if(!document.getElementById("feedback-panel").classList.contains("hidden")) return;
+    
     document.getElementById("options-container").style.pointerEvents = "none";
     if (isCorrect) {
         correctCount++;
@@ -142,7 +145,6 @@ function showResults() {
     stats.textContent = `${correctCount} / ${totalQuestions}`;
     starContainer.innerHTML = ""; 
 
-    // Animated Star Loop
     for (let i = 0; i < totalQuestions; i++) {
         const star = document.createElement("span");
         star.className = "star";
@@ -150,9 +152,10 @@ function showResults() {
         if (i < correctCount) star.classList.add("active");
         star.style.animationDelay = `${i * 0.15}s`;
         
-        // Star sound pop
+        // Rising Star SFX
         setTimeout(() => {
-            SFX.play(500 + (i * 100), 'sine', 0.1, 0.03);
+            const freq = 500 + (i * 150);
+            SFX.play(freq, 'sine', 0.1, 0.04);
         }, i * 150);
 
         starContainer.appendChild(star);
