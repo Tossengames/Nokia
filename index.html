@@ -10,29 +10,34 @@
 
 <div class="container">
   <div id="menu" class="panel">
-    <h1>🤳 Nokia Nostalgia</h1>
-    <p>How well do you remember the bricks?</p>
-    <button class="menu-btn" id="play-btn">Start Quiz</button>
-    <button class="menu-btn" id="info-btn">How to Play</button>
-    <button class="menu-btn" id="support-btn">Support</button>
+    <div class="logo">🤳</div>
+    <h1>Nokia Nostalgia</h1>
+    <p>The ultimate test for the brick-phone generation.</p>
+    <button class="menu-btn" id="play-btn">START QUIZ</button>
+    <button class="menu-btn secondary" id="info-btn">HOW TO PLAY</button>
+    <button class="menu-btn secondary" id="support-btn">SUPPORT</button>
   </div>
 
   <div id="info-screen" class="panel hidden">
-    <h2>Instructions</h2>
-    <p>Test your 2000s knowledge! You'll face 5 random questions about classic Nokia devices.</p>
-    <button class="menu-btn" id="info-back">Back</button>
+    <h2>How to Play</h2>
+    <div class="info-text">
+      <p>• <strong>5 Questions</strong> per session.</p>
+      <p>• <strong>Type A:</strong> Identify the model (4 choices).</p>
+      <p>• <strong>Type B:</strong> Match fact to phone (3 small images).</p>
+    </div>
+    <button class="menu-btn" id="info-back">GOT IT</button>
   </div>
 
   <div id="support-screen" class="panel hidden">
     <h2>Support</h2>
-    <p>Keep the nostalgia alive! Check out our Ko-fi page.</p>
-    <button class="menu-btn" id="support-back">Back</button>
+    <p>Help keep the retro vibes alive! Ko-fi link coming soon.</p>
+    <button class="menu-btn" id="support-back">BACK</button>
   </div>
 
   <div id="quiz-screen" class="panel hidden">
     <div class="status-bar">
-      <span id="progress">Question 1/5</span>
-      <span id="score">Score: 0</span>
+      <span id="progress">Q: 1/5</span>
+      <span id="score-display">Score: 0</span>
     </div>
     <h3 id="question-text">Loading...</h3>
     
@@ -40,15 +45,16 @@
 
     <div id="feedback-panel" class="hidden">
       <div id="feedback-content"></div>
-      <button id="next-btn" class="menu-btn">Next Question →</button>
+      <button id="next-btn" class="menu-btn">NEXT →</button>
     </div>
   </div>
 
   <div id="result-screen" class="panel hidden">
     <h2>Quiz Complete!</h2>
-    <div id="final-stats"></div>
+    <div id="stars-container"></div>
+    <div id="final-stats" class="big-score">0/5</div>
     <div id="rank-message"></div>
-    <button class="menu-btn" onclick="location.reload()">Try Again</button>
+    <button class="menu-btn" onclick="location.reload()">PLAY AGAIN</button>
   </div>
 </div>
 
