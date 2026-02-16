@@ -1,15 +1,15 @@
 :root {
-  --bg: #0a0e14;
-  --panel-bg: rgba(255, 255, 255, 0.05);
-  --accent: #007aff;
+  --bg: #0d1117;
+  --panel-bg: rgba(30, 35, 45, 0.98);
+  --accent: #0070f3;
   --success: #2ecc71;
   --error: #e74c3c;
-  --text: #ffffff;
+  --text: #f0f6fc;
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: var(--bg);
   color: var(--text);
   display: flex;
@@ -18,88 +18,98 @@ body {
   min-height: 100vh;
 }
 
-.container {
-  width: 90%;
-  max-width: 450px;
-}
+.container { width: 100%; max-width: 420px; padding: 15px; }
 
 .panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(10px);
-  padding: 30px;
-  border-radius: 20px;
+  padding: 25px;
+  border-radius: 24px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  text-align: center;
   border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  animation: fadeIn 0.4s ease-out;
+  animation: slideIn 0.3s ease-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .hidden { display: none !important; }
 
-/* Buttons */
+/* Buttons & VFX */
 .menu-btn, .option-btn {
   width: 100%;
-  padding: 15px;
-  margin: 10px 0;
+  padding: 16px;
+  margin: 8px 0;
   border: none;
   border-radius: 12px;
   background: var(--accent);
   color: white;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
+  transition: all 0.2s;
 }
 
-.menu-btn:active { transform: scale(0.98); }
+.menu-btn.secondary { background: rgba(255,255,255,0.08); margin-top: 5px; }
 
-/* Grid for Type B (Small Images) */
+/* Type A (Big Image) */
+.phone-img-large {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  margin-bottom: 15px;
+  border-radius: 10px;
+}
+
+/* Type B (3 Small Images) */
 .image-options-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  margin-top: 20px;
+  margin: 15px 0;
 }
 
 .img-option-card {
   background: rgba(255,255,255,0.05);
   padding: 8px;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   border: 2px solid transparent;
 }
 
-.img-option-card:hover { border-color: var(--accent); }
+.phone-img-small { width: 100%; height: 85px; object-fit: contain; }
 
-.phone-img-small {
-  width: 100%;
-  height: 100px;
-  object-fit: contain;
+/* Feedback Effects */
+.vfx-correct { animation: pulseGreen 0.5s forwards; background: var(--success) !important; }
+.vfx-wrong { animation: shakeRed 0.4s forwards; background: var(--error) !important; }
+
+@keyframes pulseGreen { 50% { transform: scale(1.05); } }
+@keyframes shakeRed {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
 }
 
-/* Big Image for Type A */
-.phone-img-large {
-  max-width: 200px;
-  height: auto;
-  margin: 15px auto;
-  display: block;
-}
-
-/* Feedback Panel */
-#feedback-panel {
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.1);
-}
-
-.status-bar {
+/* Stars Results */
+#stars-container {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.8em;
-  color: #888;
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 2.2rem;
 }
+
+.star {
+  color: #333;
+  opacity: 0;
+  transform: scale(0);
+  animation: starPop 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
+}
+
+.star.active { color: #ffcc00; text-shadow: 0 0 10px rgba(255,204,0,0.4); }
+
+@keyframes starPop { to { opacity: 1; transform: scale(1); } }
+
+.big-score { font-size: 2.8rem; font-weight: 800; color: var(--accent); margin: 10px 0; }
+.status-bar { display: flex; justify-content: space-between; margin-bottom: 15px; color: #888; font-size: 0.85em; }
