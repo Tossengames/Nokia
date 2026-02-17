@@ -32,6 +32,7 @@ const screens = {
     result: document.getElementById("result-screen")
 };
 
+// Navigation
 document.getElementById("play-btn").onclick = startQuiz;
 document.getElementById("info-btn").onclick = () => switchScreen('info');
 document.getElementById("support-btn").onclick = () => switchScreen('support');
@@ -64,31 +65,30 @@ function nextQuestion() {
     questionCount++;
     document.getElementById("feedback-overlay").classList.add("hidden");
     
-    const type = Math.random() < 0.5 ? 'A' : 'B';
     const correctPhone = phones[Math.floor(Math.random() * phones.length)];
-    
-    // Both types now use exactly 3 total options (1 correct + 2 distractors)
-    const distractors = phones
-        .filter(p => p.model !== correctPhone.model)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 2);
-
+    let distractors = phones.filter(p => p.model !== correctPhone.model)
+                            .sort(() => 0.5 - Math.random()).slice(0, 2);
     const options = [...distractors, correctPhone].sort(() => 0.5 - Math.random());
+
+    const type = Math.random() < 0.5 ? 'A' : 'B';
     renderQuestion(type, correctPhone, options);
 }
 
-async function renderQuestion(type, correct, options) {
+function renderQuestion(type, correct, options) {
     const container = document.getElementById("options-container");
     const qText = document.getElementById("question-text");
-    container.innerHTML = "Locating handset...";
+    container.innerHTML = "";
     
     document.getElementById("progress").textContent = `Q: ${questionCount}/${totalQuestions}`;
     document.getElementById("score-display").textContent = `Score: ${correctCount}`;
 
     if (type === 'A') {
-        qText.textContent = "What model is this?";
-        const imgUrl = await fetchWikiImage(correct.wiki);
-        container.innerHTML = `<img src="${imgUrl}" class="phone-img-large">`;
+        qText.textContent = "Which model is this?";
+        const img = document.createElement("img");
+        img.src = `phones/${correct.image}`; // Pulls from your local folder
+        img.className = "phone-img-large";
+        container.appendChild(img);
+        
         options.forEach(opt => {
             const btn = document.createElement("button");
             btn.className = "option-btn";
@@ -97,18 +97,17 @@ async function renderQuestion(type, correct, options) {
             container.appendChild(btn);
         });
     } else {
-        qText.textContent = `"${correct.fact}"`;
+        qText.innerHTML = `Identify the device:<br><small>"${correct.fact}"</small>`;
         const grid = document.createElement("div");
         grid.className = "image-options-grid";
-        for (let opt of options) {
-            const imgUrl = await fetchWikiImage(opt.wiki);
+        
+        options.forEach(opt => {
             const card = document.createElement("div");
             card.className = "img-option-card";
-            card.innerHTML = `<img src="${imgUrl}" class="phone-img-small">`;
+            card.innerHTML = `<img src="phones/${opt.image}" class="phone-img-small">`;
             card.onclick = () => handleCheck(opt === correct, correct, card);
             grid.appendChild(card);
-        }
-        container.innerHTML = "";
+        });
         container.appendChild(grid);
     }
 }
@@ -125,12 +124,10 @@ function handleCheck(isCorrect, phone, el) {
 
     const overlay = document.getElementById("feedback-overlay");
     const feedbackText = document.getElementById("feedback-text");
-    
     feedbackText.innerHTML = `
-        <h2 style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">${isCorrect ? 'Correct!' : 'Wrong!'}</h2>
-        <p>This is the <strong>${phone.model}</strong> (${phone.year}).</p>
+        <h2 style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">${isCorrect ? 'Bingo!' : 'Oops!'}</h2>
+        <p>That was the <strong>${phone.model}</strong>.</p>
     `;
-    
     overlay.classList.remove("hidden");
 }
 
@@ -147,21 +144,7 @@ function showResults() {
         star.innerHTML = "★";
         if (i < correctCount) star.classList.add("active");
         star.style.animationDelay = `${i * 0.15}s`;
-        setTimeout(() => {
-            SFX.play(500 + (i * 150), 'sine', 0.1, 0.04);
-        }, i * 150);
+        setTimeout(() => SFX.play(500 + (i * 100), 'sine', 0.1, 0.04), i * 150);
         starContainer.appendChild(star);
     }
-    
-    document.getElementById("rank-message").textContent = 
-        correctCount === 5 ? "Nokia Legend! 🏆" : (correctCount >= 3 ? "Great Job! 📱" : "Keep Trying! 💾");
-}
-
-async function fetchWikiImage(page) {
-    try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${page}&prop=pageimages&pithumbsize=400&format=json&origin=*`);
-        const data = await res.json();
-        const p = Object.values(data.query.pages)[0];
-        return p.thumbnail ? p.thumbnail.source : "https://via.placeholder.com/200?text=No+Image";
-    } catch { return "https://via.placeholder.com/200?text=Error"; }
 }
