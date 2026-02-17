@@ -3,12 +3,15 @@ name: Download Nokia Images
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   download:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -16,10 +19,13 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install deps
+        run: npm install
+
       - name: Run image downloader
         run: node im1.js
 
-      - name: Commit images
+      - name: Commit and push images
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
