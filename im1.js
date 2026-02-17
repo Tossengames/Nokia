@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const fetch = require("node-fetch");
 
 const phones = JSON.parse(fs.readFileSync("phones.json", "utf8"));
 const OUTPUT_DIR = "./phones";
@@ -10,10 +9,12 @@ if (!fs.existsSync(OUTPUT_DIR)) {
 }
 
 function fileNameFromModel(model) {
-  return model
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "") + ".jpg";
+  return (
+    model
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") + ".jpg"
+  );
 }
 
 async function fetchMainImage(wikiTitle) {
@@ -52,13 +53,13 @@ async function run() {
     }
 
     const imgRes = await fetch(imgUrl);
-    const buffer = await imgRes.arrayBuffer();
-    fs.writeFileSync(filePath, Buffer.from(buffer));
+    const buffer = Buffer.from(await imgRes.arrayBuffer());
+    fs.writeFileSync(filePath, buffer);
 
     console.log(`✅ Saved: ${fileName}`);
   }
 
-  console.log("\n🎉 Image download complete.");
+  console.log("\n🎉 All images downloaded successfully.");
 }
 
 run();
