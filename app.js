@@ -1,7 +1,9 @@
 let phones = [];
 let questionCount = 0;
 let correctCount = 0;
-const totalQuestions = 5;
+let timerInterval;
+let timeLeft;
+const timeLimit = 10; // 10 Seconds
 
 const SFX = {
     ctx: null,
@@ -19,25 +21,12 @@ const SFX = {
         osc.start();
         osc.stop(this.ctx.currentTime + duration);
     },
-    click() { this.play(600, 'sine', 0.1); },
     correct() { this.play(800, 'sine', 0.1); setTimeout(() => this.play(1200, 'sine', 0.2), 100); },
-    wrong() { this.play(150, 'square', 0.3, 0.05); }
-};
-
-const screens = {
-    menu: document.getElementById("menu"),
-    quiz: document.getElementById("quiz-screen"),
-    result: document.getElementById("result-screen")
+    wrong() { this.play(100, 'square', 0.4, 0.1); }
 };
 
 document.getElementById("play-btn").onclick = startQuiz;
 document.getElementById("next-btn").onclick = nextQuestion;
-
-function switchScreen(key) {
-    SFX.click();
-    Object.values(screens).forEach(s => s.classList.add("hidden"));
-    screens[key].classList.remove("hidden");
-}
 
 async function startQuiz() {
     if (phones.length === 0) {
@@ -50,104 +39,101 @@ async function startQuiz() {
     nextQuestion();
 }
 
-// Fixed Image Loader: Tries .jpg, then .png, then .webp
-function loadImage(modelName, imgElement) {
-    const baseName = modelName.toLowerCase().replace(/\s+/g, '-');
-    const extensions = ['jpg', 'png', 'webp', 'jpeg'];
-    let index = 0;
+function startTimer() {
+    timeLeft = 100;
+    const bar = document.getElementById("timer-bar");
+    clearInterval(timerInterval);
+    
+    timerInterval = setInterval(() => {
+        timeLeft -= 1; // Faster update for smoothness
+        bar.style.width = timeLeft + "%";
+        
+        // Change color as it gets low
+        if (timeLeft < 30) bar.style.background = "#ff0055";
+        else bar.style.background = "#00ff88";
 
-    const tryNext = () => {
-        if (index < extensions.length) {
-            imgElement.src = `phones/${baseName}.${extensions[index]}`;
-            index++;
-        } else {
-            imgElement.src = 'https://via.placeholder.com/200?text=Image+Missing';
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            handleCheck(false, null, null, true); // Time Out
         }
-    };
-
-    imgElement.onerror = tryNext;
-    tryNext(); // Start first attempt
+    }, 100); // 10 seconds total
 }
 
 function nextQuestion() {
-    if (questionCount >= totalQuestions) {
-        showResults();
-        return;
-    }
+    if (questionCount >= 5) { showResults(); return; }
     questionCount++;
     document.getElementById("feedback-overlay").classList.add("hidden");
-    
-    // Pick correct answer
     const correctPhone = phones[Math.floor(Math.random() * phones.length)];
-    
-    // Pick 2 distractors
-    let distractors = phones.filter(p => p.model !== correctPhone.model)
-                            .sort(() => 0.5 - Math.random()).slice(0, 2);
-    
+    const distractors = phones.filter(p => p.model !== correctPhone.model).sort(() => 0.5 - Math.random()).slice(0, 2);
     const options = [...distractors, correctPhone].sort(() => 0.5 - Math.random());
 
     renderQuestion(correctPhone, options);
+    startTimer();
 }
 
 function renderQuestion(correct, options) {
     const container = document.getElementById("options-container");
-    const qText = document.getElementById("question-text");
     container.innerHTML = "";
-    
-    document.getElementById("progress").textContent = `Q: ${questionCount}/${totalQuestions}`;
-    document.getElementById("score-display").textContent = `Score: ${correctCount}`;
+    document.getElementById("progress").textContent = `QUESTION ${questionCount}/5`;
+    document.getElementById("score-display").textContent = `${correctCount * 100} PTS`;
 
-    qText.textContent = "Which Nokia is this?";
-    
-    // Create and load image with fallback
     const img = document.createElement("img");
     img.className = "phone-img-large";
-    loadImage(correct.model, img);
+    img.src = `phones/${correct.model.toLowerCase().replace(/\s+/g, '-')}.jpg`; 
+    img.onerror = () => { img.src = `phones/${correct.model.toLowerCase().replace(/\s+/g, '-')}.png`; };
     container.appendChild(img);
-    
-    // Create 3 text buttons
+
     options.forEach(opt => {
         const btn = document.createElement("button");
-        btn.className = "option-btn";
+        btn.className = "menu-btn option-btn";
         btn.textContent = opt.model;
         btn.onclick = () => handleCheck(opt === correct, correct, btn);
         container.appendChild(btn);
     });
 }
 
-function handleCheck(isCorrect, phone, el) {
+function handleCheck(isCorrect, phone, el, isTimeOut = false) {
+    clearInterval(timerInterval);
+    const overlay = document.getElementById("feedback-overlay");
+    const feedbackText = document.getElementById("feedback-text");
+    const quizPanel = document.getElementById("quiz-screen");
+
     if (isCorrect) {
         correctCount++;
         SFX.correct();
-        el.classList.add("vfx-correct");
+        el.style.background = "var(--success)";
+        el.style.color = "#000";
     } else {
         SFX.wrong();
-        el.classList.add("vfx-wrong");
+        quizPanel.classList.add("shake");
+        setTimeout(() => quizPanel.classList.remove("shake"), 400);
+        if(el) el.style.background = "var(--error)";
     }
 
-    const overlay = document.getElementById("feedback-overlay");
-    const feedbackText = document.getElementById("feedback-text");
     feedbackText.innerHTML = `
-        <h2 style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">${isCorrect ? 'Correct!' : 'Wrong!'}</h2>
-        <p>This is the <strong>${phone.model}</strong>.</p>
+        <h1 style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">
+            ${isTimeOut ? "TIME'S UP!" : (isCorrect ? "CLEAN!" : "NOPE!")}
+        </h1>
+        <p>That was the <b>${phone ? phone.model : "secret phone"}</b></p>
     `;
     overlay.classList.remove("hidden");
 }
 
 function showResults() {
     switchScreen('result');
-    const stats = document.getElementById("final-stats");
-    const starContainer = document.getElementById("stars-container");
-    stats.textContent = `${correctCount} / ${totalQuestions}`;
-    starContainer.innerHTML = ""; 
-
-    for (let i = 0; i < totalQuestions; i++) {
-        const star = document.createElement("span");
-        star.className = "star";
-        star.innerHTML = "★";
-        if (i < correctCount) star.classList.add("active");
-        star.style.animationDelay = `${i * 0.15}s`;
-        setTimeout(() => SFX.play(500 + (i * 100), 'sine', 0.1, 0.04), i * 150);
-        starContainer.appendChild(star);
+    document.getElementById("final-stats").textContent = `${correctCount} / 5`;
+    const stars = document.getElementById("stars-container");
+    stars.innerHTML = "";
+    for(let i=0; i<5; i++) {
+        const s = document.createElement("span");
+        s.className = "star " + (i < correctCount ? "active" : "");
+        s.innerHTML = "★";
+        s.style.animationDelay = (i * 0.2) + "s";
+        stars.appendChild(s);
     }
+}
+
+function switchScreen(id) {
+    ["menu", "quiz-screen", "result"].forEach(s => document.getElementById(s).classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
 }
