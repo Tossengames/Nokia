@@ -1,6 +1,6 @@
-import fs from "fs";
-import fetch from "node-fetch";
-import path from "path";
+const fs = require("fs");
+const path = require("path");
+const fetch = require("node-fetch");
 
 const phones = JSON.parse(fs.readFileSync("phones.json", "utf8"));
 const OUTPUT_DIR = "./phones";
@@ -30,7 +30,7 @@ async function fetchMainImage(wikiTitle) {
   const data = await res.json();
   const page = Object.values(data.query.pages)[0];
 
-  return page?.thumbnail?.source || null;
+  return page && page.thumbnail ? page.thumbnail.source : null;
 }
 
 async function run() {
@@ -39,7 +39,7 @@ async function run() {
     const filePath = path.join(OUTPUT_DIR, fileName);
 
     if (fs.existsSync(filePath)) {
-      console.log(`⏭️  Skipped (exists): ${fileName}`);
+      console.log(`⏭️  Skipped: ${fileName}`);
       continue;
     }
 
@@ -47,7 +47,7 @@ async function run() {
 
     const imgUrl = await fetchMainImage(phone.wiki);
     if (!imgUrl) {
-      console.log(`❌ No image found`);
+      console.log("❌ No image found");
       continue;
     }
 
@@ -58,7 +58,7 @@ async function run() {
     console.log(`✅ Saved: ${fileName}`);
   }
 
-  console.log("\n🎉 All images downloaded.");
+  console.log("\n🎉 Image download complete.");
 }
 
 run();
