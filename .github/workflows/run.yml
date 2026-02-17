@@ -1,13 +1,40 @@
-- name: Clear phones folder
-  run: rm -rf phones/*.jpg
+name: Redownload Nokia Images
 
-- name: Download Wikipedia images
-  run: node im1.mjs
+# Manual trigger
+on:
+  workflow_dispatch:
 
-- name: Commit changes
-  run: |
-    git config user.name "github-actions"
-    git config user.email "github-actions@github.com"
-    git add phones
-    git commit -m "Redownload all Nokia images" || echo "No changes"
-    git push
+jobs:
+  redownload:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1 — Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2 — Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # Step 3 — Clear existing images
+      - name: Clear phones folder
+        run: |
+          mkdir -p phones
+          rm -rf phones/*.jpg
+          echo "✅ Cleared all existing phone images"
+
+      # Step 4 — Run download script
+      - name: Download Wikipedia images
+        run: node im1.mjs
+
+      # Step 5 — Commit and push images
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add phones
+          git commit -m "Redownload all Nokia images" || echo "No changes"
+          git push
