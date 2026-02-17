@@ -26,18 +26,11 @@ const SFX = {
 
 const screens = {
     menu: document.getElementById("menu"),
-    info: document.getElementById("info-screen"),
-    support: document.getElementById("support-screen"),
     quiz: document.getElementById("quiz-screen"),
     result: document.getElementById("result-screen")
 };
 
-// Navigation
 document.getElementById("play-btn").onclick = startQuiz;
-document.getElementById("info-btn").onclick = () => switchScreen('info');
-document.getElementById("support-btn").onclick = () => switchScreen('support');
-document.getElementById("info-back").onclick = () => switchScreen('menu');
-document.getElementById("support-back").onclick = () => switchScreen('menu');
 document.getElementById("next-btn").onclick = nextQuestion;
 
 function switchScreen(key) {
@@ -55,6 +48,12 @@ async function startQuiz() {
     correctCount = 0;
     switchScreen('quiz');
     nextQuestion();
+}
+
+// Utility to match your folder filenames: "Nokia 3310" -> "nokia-3310.jpg"
+function getImagePath(modelName) {
+    const fileName = modelName.toLowerCase().replace(/\s+/g, '-');
+    return `phones/${fileName}.jpg`; 
 }
 
 function nextQuestion() {
@@ -83,9 +82,9 @@ function renderQuestion(type, correct, options) {
     document.getElementById("score-display").textContent = `Score: ${correctCount}`;
 
     if (type === 'A') {
-        qText.textContent = "Which model is this?";
+        qText.textContent = "Which Nokia is this?";
         const img = document.createElement("img");
-        img.src = `phones/${correct.image}`; // Pulls from your local folder
+        img.src = getImagePath(correct.model);
         img.className = "phone-img-large";
         container.appendChild(img);
         
@@ -97,14 +96,14 @@ function renderQuestion(type, correct, options) {
             container.appendChild(btn);
         });
     } else {
-        qText.innerHTML = `Identify the device:<br><small>"${correct.fact}"</small>`;
+        qText.innerHTML = `Identify the phone:<br><span class="highlight">"${correct.fact}"</span>`;
         const grid = document.createElement("div");
         grid.className = "image-options-grid";
         
         options.forEach(opt => {
             const card = document.createElement("div");
             card.className = "img-option-card";
-            card.innerHTML = `<img src="phones/${opt.image}" class="phone-img-small">`;
+            card.innerHTML = `<img src="${getImagePath(opt.model)}" class="phone-img-small">`;
             card.onclick = () => handleCheck(opt === correct, correct, card);
             grid.appendChild(card);
         });
@@ -125,8 +124,8 @@ function handleCheck(isCorrect, phone, el) {
     const overlay = document.getElementById("feedback-overlay");
     const feedbackText = document.getElementById("feedback-text");
     feedbackText.innerHTML = `
-        <h2 style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">${isCorrect ? 'Bingo!' : 'Oops!'}</h2>
-        <p>That was the <strong>${phone.model}</strong>.</p>
+        <h2 style="color:${isCorrect ? 'var(--success)' : 'var(--error)'}">${isCorrect ? 'Correct!' : 'Wrong!'}</h2>
+        <p>This is the <strong>${phone.model}</strong>.</p>
     `;
     overlay.classList.remove("hidden");
 }
