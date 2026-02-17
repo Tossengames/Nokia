@@ -16,9 +16,6 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm install node-fetch
-
       - name: Run image downloader
         run: node im1.js
 
