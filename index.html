@@ -7,42 +7,49 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="bg-blobs">
-    <div class="blob"></div>
-    <div class="blob"></div>
-  </div>
+  <canvas id="particle-canvas"></canvas>
+  <div class="bg-blobs"><div class="blob"></div><div class="blob"></div></div>
 
   <div class="container">
     <div id="menu" class="panel glass">
       <div class="logo-bounce">🤳</div>
-      <h1 class="juicy-title">Nokia<br>Nostalgia</h1>
-      <p>Identify the legendary bricks.</p>
+      <h1 class="title">Nokia Nostalgia</h1>
+      <p>The ultimate test for the brick-phone generation.</p>
       <button class="menu-btn main-action" id="play-btn">START QUIZ</button>
-      <a href="https://ko-fi.com/zesan_" target="_blank" class="menu-btn secondary">SUPPORT PROJECT</a>
+      <button class="menu-btn secondary" id="info-btn">HOW TO PLAY</button>
+      <a href="https://ko-fi.com/zesan" target="_blank" class="menu-btn secondary">SUPPORT</a>
+      <p class="disclaimer">Images are for educational/nostalgia purposes only.</p>
+    </div>
+
+    <div id="info-screen" class="panel glass hidden">
+      <h2>How to Play</h2>
+      <p>Identify the correct Nokia model shown in the image before the timer runs out. Fast and accurate answers earn more respect!</p>
+      <button class="menu-btn main-action" onclick="switchScreen('menu')">BACK TO MENU</button>
     </div>
 
     <div id="quiz-screen" class="panel glass hidden">
       <div id="timer-wrapper"><div id="timer-bar"></div></div>
       <div class="status-bar">
-        <span id="progress">Q: 1/5</span>
-        <span id="score-display">000</span>
+        <span id="progress">QUESTION 1/5</span>
+        <span id="score-display">0</span>
       </div>
       <div id="options-container"></div>
 
       <div id="feedback-overlay" class="hidden">
         <div id="feedback-content-pane">
           <div id="feedback-text"></div>
-          <button id="next-btn" class="menu-btn main-action">NEXT →</button>
+          <button id="next-btn" class="menu-btn main-action">CONTINUE →</button>
         </div>
       </div>
     </div>
 
     <div id="result-screen" class="panel glass hidden">
-      <h2 class="bounce-in">RESULTS</h2>
+      <h2 id="result-header">QUIZ COMPLETE</h2>
       <div id="stars-container"></div>
       <div id="final-stats" class="big-score">0/5</div>
-      <div id="rank-message"></div>
+      <p id="rank-message"></p>
       <button class="menu-btn main-action" onclick="location.reload()">PLAY AGAIN</button>
+      <button class="menu-btn secondary" onclick="switchScreen('menu')">BACK TO MENU</button>
     </div>
   </div>
 
