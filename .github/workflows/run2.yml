@@ -1,31 +1,23 @@
-name: Download Nokia Images
+name: Download Phone Images
 
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   download:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Run image downloader
-        run: node im1.mjs
+      - run: node im1.mjs
 
-      - name: Commit and push images
-        run: |
+      - run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add phones
-          git commit -m "Add Nokia phone images" || echo "No changes"
+          git commit -m "Add phone images" || echo "No changes"
           git push
