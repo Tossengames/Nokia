@@ -1,34 +1,13 @@
-name: Download Nokia Images
+- name: Clear phones folder
+  run: rm -rf phones/*.jpg
 
-on:
-  workflow_dispatch:
+- name: Download Wikipedia images
+  run: node im1.mjs
 
-permissions:
-  contents: write
-
-jobs:
-  download:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install deps
-        run: npm install
-
-      - name: Run image downloader
-        run: node im1.js
-
-      - name: Commit and push images
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add phones
-          git commit -m "Add Nokia phone images" || echo "No changes"
-          git push
+- name: Commit changes
+  run: |
+    git config user.name "github-actions"
+    git config user.email "github-actions@github.com"
+    git add phones
+    git commit -m "Redownload all Nokia images" || echo "No changes"
+    git push
