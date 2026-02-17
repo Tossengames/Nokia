@@ -50,10 +50,23 @@ async function startQuiz() {
     nextQuestion();
 }
 
-// Utility to match your folder filenames: "Nokia 3310" -> "nokia-3310.jpg"
-function getImagePath(modelName) {
-    const fileName = modelName.toLowerCase().replace(/\s+/g, '-');
-    return `phones/${fileName}.jpg`; 
+// Fixed Image Loader: Tries .jpg, then .png, then .webp
+function loadImage(modelName, imgElement) {
+    const baseName = modelName.toLowerCase().replace(/\s+/g, '-');
+    const extensions = ['jpg', 'png', 'webp', 'jpeg'];
+    let index = 0;
+
+    const tryNext = () => {
+        if (index < extensions.length) {
+            imgElement.src = `phones/${baseName}.${extensions[index]}`;
+            index++;
+        } else {
+            imgElement.src = 'https://via.placeholder.com/200?text=Image+Missing';
+        }
+    };
+
+    imgElement.onerror = tryNext;
+    tryNext(); // Start first attempt
 }
 
 function nextQuestion() {
@@ -64,16 +77,19 @@ function nextQuestion() {
     questionCount++;
     document.getElementById("feedback-overlay").classList.add("hidden");
     
+    // Pick correct answer
     const correctPhone = phones[Math.floor(Math.random() * phones.length)];
+    
+    // Pick 2 distractors
     let distractors = phones.filter(p => p.model !== correctPhone.model)
                             .sort(() => 0.5 - Math.random()).slice(0, 2);
+    
     const options = [...distractors, correctPhone].sort(() => 0.5 - Math.random());
 
-    const type = Math.random() < 0.5 ? 'A' : 'B';
-    renderQuestion(type, correctPhone, options);
+    renderQuestion(correctPhone, options);
 }
 
-function renderQuestion(type, correct, options) {
+function renderQuestion(correct, options) {
     const container = document.getElementById("options-container");
     const qText = document.getElementById("question-text");
     container.innerHTML = "";
@@ -81,34 +97,22 @@ function renderQuestion(type, correct, options) {
     document.getElementById("progress").textContent = `Q: ${questionCount}/${totalQuestions}`;
     document.getElementById("score-display").textContent = `Score: ${correctCount}`;
 
-    if (type === 'A') {
-        qText.textContent = "Which Nokia is this?";
-        const img = document.createElement("img");
-        img.src = getImagePath(correct.model);
-        img.className = "phone-img-large";
-        container.appendChild(img);
-        
-        options.forEach(opt => {
-            const btn = document.createElement("button");
-            btn.className = "option-btn";
-            btn.textContent = opt.model;
-            btn.onclick = () => handleCheck(opt === correct, correct, btn);
-            container.appendChild(btn);
-        });
-    } else {
-        qText.innerHTML = `Identify the phone:<br><span class="highlight">"${correct.fact}"</span>`;
-        const grid = document.createElement("div");
-        grid.className = "image-options-grid";
-        
-        options.forEach(opt => {
-            const card = document.createElement("div");
-            card.className = "img-option-card";
-            card.innerHTML = `<img src="${getImagePath(opt.model)}" class="phone-img-small">`;
-            card.onclick = () => handleCheck(opt === correct, correct, card);
-            grid.appendChild(card);
-        });
-        container.appendChild(grid);
-    }
+    qText.textContent = "Which Nokia is this?";
+    
+    // Create and load image with fallback
+    const img = document.createElement("img");
+    img.className = "phone-img-large";
+    loadImage(correct.model, img);
+    container.appendChild(img);
+    
+    // Create 3 text buttons
+    options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt.model;
+        btn.onclick = () => handleCheck(opt === correct, correct, btn);
+        container.appendChild(btn);
+    });
 }
 
 function handleCheck(isCorrect, phone, el) {
