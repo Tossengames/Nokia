@@ -2,59 +2,52 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Nokia Nostalgia Quiz</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="bg-blobs">
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+  </div>
 
 <div class="container">
-  <div id="menu" class="panel">
-    <div class="logo">🤳</div>
-    <h1>Nokia Nostalgia</h1>
-    <p>The ultimate test for the brick-phone generation.</p>
-    <button class="menu-btn" id="play-btn">START QUIZ</button>
+  <div id="menu" class="panel glass">
+    <div class="logo-bounce">🤳</div>
+    <h1 class="glitch" data-text="Nokia Nostalgia">Nokia Nostalgia</h1>
+    <p>The ultimate 2000s tech test.</p>
+    <button class="menu-btn main-action" id="play-btn">START QUIZ</button>
     <button class="menu-btn secondary" id="info-btn">HOW TO PLAY</button>
-    <button class="menu-btn secondary" id="support-btn">SUPPORT</button>
+    <a href="https://ko-fi.com/zesan_" target="_blank" class="menu-btn secondary">SUPPORT</a>
   </div>
 
-  <div id="info-screen" class="panel hidden">
-    <h2>How to Play</h2>
-    <div class="info-text">
-      <p>Test your memory of the legendary Nokia era! You'll face 5 questions: identifying models by sight or matching them to their iconic history. Answer quickly and see your rank at the end!</p>
+  <div id="quiz-screen" class="panel glass hidden">
+    <div id="timer-wrapper">
+        <div id="timer-bar"></div>
     </div>
-    <button class="menu-btn" id="info-back">GOT IT</button>
-  </div>
-
-  <div id="support-screen" class="panel hidden">
-    <h2>Support</h2>
-    <p>Help keep the retro vibes alive and support the development!</p>
-    <a href="https://ko-fi.com/zesan" target="_blank" class="menu-btn kofi-link">Support on Ko-fi</a>
-    <button class="menu-btn secondary" id="support-back">BACK</button>
-  </div>
-
-  <div id="quiz-screen" class="panel hidden">
     <div class="status-bar">
       <span id="progress">Q: 1/5</span>
-      <span id="score-display">Score: 0</span>
+      <span id="score-display">0 PTS</span>
     </div>
-    <h3 id="question-text">Loading...</h3>
+    <h3 id="question-text">Who is this legend?</h3>
     <div id="options-container"></div>
 
     <div id="feedback-overlay" class="hidden">
       <div id="feedback-content-pane">
         <div id="feedback-text"></div>
-        <button id="next-btn" class="menu-btn">CONTINUE →</button>
+        <button id="next-btn" class="menu-btn main-action">CONTINUE →</button>
       </div>
     </div>
   </div>
 
-  <div id="result-screen" class="panel hidden">
-    <h2>Quiz Complete!</h2>
+  <div id="result-screen" class="panel glass hidden">
+    <h2 class="bounce-in">MISSION COMPLETE</h2>
     <div id="stars-container"></div>
     <div id="final-stats" class="big-score">0/5</div>
     <div id="rank-message"></div>
-    <button class="menu-btn" onclick="location.reload()">PLAY AGAIN</button>
+    <button class="menu-btn main-action" onclick="location.reload()">REPLAY 🔄</button>
   </div>
 </div>
 
