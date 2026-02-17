@@ -4,12 +4,12 @@ import path from "path";
 const PHONES_JSON = "./phones.json";
 const OUTPUT_DIR = "./phones";
 
-// ensure phones folder exists
+// Ensure the phones folder exists
 if (!fs.existsSync(OUTPUT_DIR)) {
   fs.mkdirSync(OUTPUT_DIR);
 }
 
-// read phones.json
+// Read phones.json
 const phones = JSON.parse(fs.readFileSync(PHONES_JSON, "utf-8"));
 
 function slugify(name) {
@@ -20,21 +20,22 @@ function slugify(name) {
 }
 
 for (const phone of phones) {
-  const slug = slugify(phone.name);
+  const slug = slugify(phone.model);
   const filePath = path.join(OUTPUT_DIR, `${slug}.jpg`);
 
-  // skip if image already exists
+  // Skip if image already exists
   if (fs.existsSync(filePath)) {
-    console.log(`Skipping ${phone.name} (already exists)`);
+    console.log(`Skipping ${phone.model} (already exists)`);
     continue;
   }
 
-  const url = `https://source.unsplash.com/600x800/?mobile,phone,${encodeURIComponent(phone.name)}`;
+  // Use Unsplash search as a placeholder image
+  const url = `https://source.unsplash.com/600x800/?mobile,phone,${encodeURIComponent(phone.model)}`;
 
   try {
     const res = await fetch(url);
     if (!res.ok) {
-      console.log(`Failed ${phone.name}`);
+      console.log(`Failed to download ${phone.model}`);
       continue;
     }
 
@@ -42,6 +43,6 @@ for (const phone of phones) {
     fs.writeFileSync(filePath, buffer);
     console.log(`Saved ${slug}.jpg`);
   } catch (err) {
-    console.log(`Error downloading ${phone.name}`);
+    console.log(`Error downloading ${phone.model}: ${err}`);
   }
 }
