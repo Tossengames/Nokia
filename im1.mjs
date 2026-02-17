@@ -1,24 +1,47 @@
 import fs from "fs";
 import path from "path";
 
-const phones = [
-  "nokia 3310",
-  "nokia 1100",
-  "nokia 6600",
-  "nokia n95",
-  "nokia n97"
-];
+const PHONES_JSON = "./phones.json";
+const OUTPUT_DIR = "./phones";
 
-const outDir = "phones";
-if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
+// ensure phones folder exists
+if (!fs.existsSync(OUTPUT_DIR)) {
+  fs.mkdirSync(OUTPUT_DIR);
+}
+
+// read phones.json
+const phones = JSON.parse(fs.readFileSync(PHONES_JSON, "utf-8"));
+
+function slugify(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
 for (const phone of phones) {
-  const name = phone.toLowerCase().replace(/\s+/g, "-");
-  const url = `https://source.unsplash.com/600x800/?${encodeURIComponent(phone)}`;
+  const slug = slugify(phone.name);
+  const filePath = path.join(OUTPUT_DIR, `${slug}.jpg`);
 
-  const res = await fetch(url);
-  const buf = Buffer.from(await res.arrayBuffer());
+  // skip if image already exists
+  if (fs.existsSync(filePath)) {
+    console.log(`Skipping ${phone.name} (already exists)`);
+    continue;
+  }
 
-  fs.writeFileSync(path.join(outDir, `${name}.jpg`), buf);
-  console.log(`Saved ${name}.jpg`);
+  const url = `https://source.unsplash.com/600x800/?mobile,phone,${encodeURIComponent(phone.name)}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      console.log(`Failed ${phone.name}`);
+      continue;
+    }
+
+    const buffer = Buffer.from(await res.arrayBuffer());
+    fs.writeFileSync(filePath, buffer);
+    console.log(`Saved ${slug}.jpg`);
+  } catch (err) {
+    console.log(`Error downloading ${phone.name}`);
+  }
 }
